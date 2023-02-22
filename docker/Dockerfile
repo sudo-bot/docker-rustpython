@@ -10,15 +10,22 @@ ENV CARGO_INSTALL_ROOT="/workdir"
 # Newer rust needed due to let...else feature
 RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community rust cargo
 
-RUN apk --no-cache add musl-dev git
+RUN apk --no-cache add musl-dev
 
 ADD https://github.com/RustPython/RustPython/archive/refs/tags/v$RUST_PYTHON_VERSION.tar.gz /tmp/v$RUST_PYTHON_VERSION.tar.gz
+ADD https://github.com/RustPython/__doc__/archive/d927debd491e4c45b88e953e6e50e4718e0f2965.tar.gz /tmp/rp__doc__.tar.gz
+
+RUN mkdir /workdir/rp__doc__/ && tar --strip-components=1 -C /workdir/rp__doc__/ -xzf /tmp/rp__doc__.tar.gz
 
 RUN tar --strip-components=1 -C /workdir -xzf /tmp/v$RUST_PYTHON_VERSION.tar.gz
 
-RUN cargo fetch --locked
+# Remove the git mode that triggers an error on armv6 and armv7
+# Ref: https://github.com/rust-lang/cargo/issues/2808 (failed to mmap. Could not write data: Out of memory; class=Os (2))
+RUN sed -i 's#{ git = .*#{ path = "/workdir/rp__doc__/" }#' /workdir/derive-impl/Cargo.toml
 
-RUN cargo build --features freeze-stdlib --release --locked --offline --bin rustpython
+RUN cargo fetch
+
+RUN uname -m && cargo build --features freeze-stdlib --release --locked --offline --bin rustpython
 
 FROM alpine:3.17
 
