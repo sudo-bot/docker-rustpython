@@ -25,7 +25,7 @@ RUN sed -i 's#{ git = .*#{ path = "/workdir/rp__doc__/" }#' /workdir/derive-impl
 
 RUN cargo fetch
 
-RUN if [ "$(uname -m)" != "ppc64le" ] && [ "$(uname -m)" != "s390x" ] && [ "$(uname -m)" != "aarch64" ]; then cargo build --features freeze-stdlib --release --locked --offline --bin rustpython; else cargo build --release --locked --offline --bin rustpython; fi
+RUN if [ "$(uname -m)" != "ppc64le" ] && [ "$(uname -m)" != "s390x" ] && [ "$(uname -m)" != "aarch64" ]; then cargo build --features freeze-stdlib --release --locked --offline --bin rustpython; else cargo build --no-default-features --features threading,zlib,importlib,rustpython-parser/lalrpop --release --locked --offline --bin rustpython; fi
 
 FROM alpine:3.17
 
