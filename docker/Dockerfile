@@ -10,7 +10,7 @@ ENV CARGO_INSTALL_ROOT="/workdir"
 # Newer rust needed due to let...else feature
 RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community rust cargo
 
-RUN apk --no-cache add musl-dev
+RUN apk --no-cache add musl-dev git
 
 ADD https://github.com/RustPython/RustPython/archive/refs/tags/v$RUST_PYTHON_VERSION.tar.gz /tmp/v$RUST_PYTHON_VERSION.tar.gz
 
