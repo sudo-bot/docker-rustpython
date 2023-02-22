@@ -11,6 +11,7 @@ jobs:
     push_to_registry:
         name: Push Docker image to Docker hub
         runs-on: ubuntu-latest
+        timeout-minutes: 720
         environment:
             name: Build Docker images
 
