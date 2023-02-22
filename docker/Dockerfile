@@ -7,6 +7,7 @@ ARG RUST_PYTHON_VERSION="0.2.0"
 ENV CARGO_HOME="/workdir"
 ENV CARGO_INSTALL_ROOT="/workdir"
 # armv6 and armv7 fix
+# See: https://github.com/rust-lang/cargo/issues/6513#issuecomment-1440029221
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 # Newer rust needed due to let...else feature

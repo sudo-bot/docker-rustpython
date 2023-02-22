@@ -1,9 +1,8 @@
 IMAGE_TAG ?= docker-rustpython
 # All: linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm64/v8,linux/mips64le,linux/ppc64le,linux/s390x
 # Supported by rust (Debian variant, alpine has 2 less): linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8
-# Supported by alpine: linux/386,linux/amd64,linux/s390x
-# Fails to build: linux/ppc64le,linux/arm64/v8
-# Fails to fetch doc git crate: linux/arm/v6,linux/arm/v7
+# Supported by alpine: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
+# Does not build: linux/s390x (https://github.com/nix-rust/nix/issues/1968, https://github.com/nix-rust/nix/pull/1835)
 PLATFORM ?= linux/amd64
 
 ACTION ?= load

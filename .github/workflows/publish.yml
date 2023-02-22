@@ -33,6 +33,6 @@ jobs:
               run: make docker-build
               env:
                   DOCKER_BUILDKIT: 1
-                  PLATFORM: "linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x"
+                  PLATFORM: "linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8,linux/ppc64le"
                   IMAGE_TAG: "docker.io/botsudo/docker-rustpython:latest"
                   ACTION: push
