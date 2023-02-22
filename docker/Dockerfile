@@ -6,6 +6,8 @@ WORKDIR /workdir
 ARG RUST_PYTHON_VERSION="0.2.0"
 ENV CARGO_HOME="/workdir"
 ENV CARGO_INSTALL_ROOT="/workdir"
+# armv6 and armv7 fix
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
 # Newer rust needed due to let...else feature
 RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community rust cargo
@@ -22,11 +24,6 @@ RUN mkdir /workdir/rp__doc__/ && tar --strip-components=1 -C /workdir/rp__doc__/
 
 RUN tar --strip-components=1 -C /workdir -xzf /tmp/v$RUST_PYTHON_VERSION.tar.gz
 RUN git apply /tmp/9cac89347e2276fcb309f108561e99f4be5baff2.patch
-
-# armv6 and armv7 fix
-# See: https://github.com/rust-lang/cargo/issues/6513#issuecomment-1425753938
-# See: https://github.com/rust-lang/cargo/issues/6513
-RUN git fetch --force --update-head-ok https://github.com/rust-lang/crates.io-index +HEAD:refs/remotes/origin/HEAD -v
 
 # Remove the git mode that triggers an error on armv6 and armv7
 # Ref: https://github.com/rust-lang/cargo/issues/2808 (failed to mmap. Could not write data: Out of memory; class=Os (2))
