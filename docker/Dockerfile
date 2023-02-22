@@ -24,9 +24,9 @@ RUN tar --strip-components=1 -C /workdir -xzf /tmp/v$RUST_PYTHON_VERSION.tar.gz
 RUN git apply /tmp/9cac89347e2276fcb309f108561e99f4be5baff2.patch
 
 # armv6 and armv7 fix
-# See: https://github.com/pyca/cryptography/issues/6673#issuecomment-985943023
+# See: https://github.com/rust-lang/cargo/issues/6513#issuecomment-864582147
 # See: https://github.com/rust-lang/cargo/issues/6513
-RUN mkdir -p ~/.cargo/registry/index && cd ~/.cargo/registry/index && git clone --bare https://github.com/rust-lang/crates.io-index.git github.com-1ecc6299db9ec823
+RUN mkdir ~/.cargo/ && echo -e '[net]\ngit-fetch-with-cli = true' > ~/.cargo/config.toml
 
 # Remove the git mode that triggers an error on armv6 and armv7
 # Ref: https://github.com/rust-lang/cargo/issues/2808 (failed to mmap. Could not write data: Out of memory; class=Os (2))
