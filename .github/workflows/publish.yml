@@ -18,7 +18,13 @@ jobs:
             fail-fast: false
             max-parallel: 4
             matrix:
-                platform: ["linux/arm/v6", "linux/arm/v7", "linux/arm64/v8", "linux/386", "linux/ppc64le", "linux/amd64"]
+                with:
+                - { platform: "linux/arm/v6", internal-tag: "armv6" }
+                - { platform: "linux/arm/v7", internal-tag: "armv7" }
+                - { platform: "linux/arm64/v8", internal-tag: "arm64v8" }
+                - { platform: "linux/386", internal-tag: "386" }
+                - { platform: "linux/ppc64le", internal-tag: "ppc64le" }
+                - { platform: "linux/amd64", internal-tag: "amd64" }
         steps:
             - name: Check out the repository
               uses: actions/checkout@v3
@@ -39,7 +45,7 @@ jobs:
               env:
                 DOCKER_BUILDKIT: 1
                 PLATFORM: ${{ matrix.platform }}
-                IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ matrix.platform }}-latest"
+                IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ internal-tag }}-latest"
                 ACTION: push
                 EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache,mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-${{ matrix.platform }}:latest"
 
