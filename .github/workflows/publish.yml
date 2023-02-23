@@ -44,10 +44,11 @@ jobs:
               run: make docker-build
               env:
                   DOCKER_BUILDKIT: 1
+                  BUILDKIT_MULTI_PLATFORM: 0
                   PLATFORM: ${{ matrix.platform }}
                   IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ matrix.internal-tag }}-latest"
                   ACTION: push
-                  EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache,mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-${{ matrix.platform }}:latest"
+                  EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache:${{ matrix.internal-tag }},mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache:${{ matrix.internal-tag }}"
 
     create-final-image:
         runs-on: ubuntu-latest
@@ -68,12 +69,12 @@ jobs:
             - name: Create the manifest
               run: |
                   docker manifest create docker.io/botsudo/docker-rustpython:latest \
-                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v6-latest \
-                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v7-latest \
-                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v8-latest \
-                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/386-latest \
-                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/ppc64le-latest \
-                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/amd64-latest
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:armv6-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:armv7-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:arm64v8-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:386-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:ppc64le-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:amd64-latest
             - name: Push the manifest
               run: docker manifest push docker.io/botsudo/docker-rustpython:latest
             - name: Inspect the manifest
