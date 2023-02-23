@@ -45,7 +45,7 @@ jobs:
               env:
                   DOCKER_BUILDKIT: 1
                   PLATFORM: ${{ matrix.platform }}
-                  IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ internal-tag }}-latest"
+                  IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ matrix.internal-tag }}-latest"
                   ACTION: push
                   EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache,mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-${{ matrix.platform }}:latest"
 
