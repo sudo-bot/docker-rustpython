@@ -8,8 +8,8 @@ on:
     release:
         types: [released]
     push:
-      tags:
-        - "*"
+        tags:
+            - "*"
 
 jobs:
     build-image:
@@ -18,13 +18,13 @@ jobs:
             fail-fast: false
             max-parallel: 4
             matrix:
-                with:
-                - { platform: "linux/arm/v6", internal-tag: "armv6" }
-                - { platform: "linux/arm/v7", internal-tag: "armv7" }
-                - { platform: "linux/arm64/v8", internal-tag: "arm64v8" }
-                - { platform: "linux/386", internal-tag: "386" }
-                - { platform: "linux/ppc64le", internal-tag: "ppc64le" }
-                - { platform: "linux/amd64", internal-tag: "amd64" }
+                include:
+                    - { platform: "linux/arm/v6", internal-tag: "armv6" }
+                    - { platform: "linux/arm/v7", internal-tag: "armv7" }
+                    - { platform: "linux/arm64/v8", internal-tag: "arm64v8" }
+                    - { platform: "linux/386", internal-tag: "386" }
+                    - { platform: "linux/ppc64le", internal-tag: "ppc64le" }
+                    - { platform: "linux/amd64", internal-tag: "amd64" }
         steps:
             - name: Check out the repository
               uses: actions/checkout@v3
@@ -43,11 +43,11 @@ jobs:
             - name: Build and push image
               run: make docker-build
               env:
-                DOCKER_BUILDKIT: 1
-                PLATFORM: ${{ matrix.platform }}
-                IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ internal-tag }}-latest"
-                ACTION: push
-                EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache,mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-${{ matrix.platform }}:latest"
+                  DOCKER_BUILDKIT: 1
+                  PLATFORM: ${{ matrix.platform }}
+                  IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ internal-tag }}-latest"
+                  ACTION: push
+                  EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache,mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-${{ matrix.platform }}:latest"
 
     create-final-image:
         runs-on: ubuntu-latest
@@ -67,13 +67,13 @@ jobs:
                   password: ${{ secrets.DOCKER_REPOSITORY_PASSWORD }}
             - name: Create the manifest
               run: |
-                docker manifest create docker.io/botsudo/docker-rustpython:latest \
-                    ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v6-latest \
-                    ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v7-latest \
-                    ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v8-latest \
-                    ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/386-latest \
-                    ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/ppc64le-latest \
-                    ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/amd64-latest
+                  docker manifest create docker.io/botsudo/docker-rustpython:latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v6-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v7-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/arm/v8-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/386-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/ppc64le-latest \
+                      ghcr.io/sudo-bot/docker-rustpython/rustpython:linux/amd64-latest
             - name: Push the manifest
               run: docker manifest push docker.io/botsudo/docker-rustpython:latest
             - name: Inspect the manifest
