@@ -4,6 +4,9 @@ FROM alpine:3.17 as builder
 WORKDIR /workdir
 
 ARG RUST_PYTHON_VERSION="0.2.0"
+ARG BUILD_DATE
+ARG VCS_REF
+
 ENV CARGO_HOME="/workdir"
 ENV CARGO_INSTALL_ROOT="/workdir"
 # armv6 and armv7 fix
@@ -78,5 +81,30 @@ EOT
 
 RUN rustpython --version && \
     echo -e "import json\nprint(json.dumps([{'server': [{'tls': False}]}]))" | rustpython -q
+
+# Metadata
+LABEL org.label-schema.vendor="Sudo-Bot" \
+    org.label-schema.url="https://github.com/sudo-bot/docker-rustpython#readme" \
+    org.label-schema.name="docker-rustpython" \
+    org.label-schema.description="RustPython into Docker" \
+    org.label-schema.version=${RUST_PYTHON_VERSION} \
+    org.label-schema.vcs-url="https://github.com/sudo-bot/docker-rustpython.git" \
+    org.label-schema.vcs-ref=${VCS_REF} \
+    org.label-schema.build-date=${BUILD_DATE} \
+    org.label-schema.docker.schema-version="1.0" \
+    \
+    com.docker.extension.publisher-url="https://github.com/sudo-bot" \
+    \
+    org.opencontainers.image.title="RustPython into Docker" \
+    org.opencontainers.image.authors="williamdes@wdes.fr" \
+    org.opencontainers.image.url="https://github.com/sudo-bot/docker-rustpython#readme" \
+    org.opencontainers.image.documentation="https://github.com/sudo-bot/docker-rustpython#readme" \
+    org.opencontainers.image.source="https://github.com/sudo-bot/docker-rustpython" \
+    org.opencontainers.image.vendor="Sudo-Bot" \
+    org.opencontainers.image.licenses="MPL-2.0" \
+    org.opencontainers.image.created=${BUILD_DATE} \
+    org.opencontainers.image.version=${RUST_PYTHON_VERSION} \
+    org.opencontainers.image.revision=${VCS_REF} \
+    org.opencontainers.image.ref.name="${RUST_PYTHON_VERSION}"
 
 ENTRYPOINT [ "/usr/local/bin/rustpython" ]
