@@ -5,7 +5,7 @@ permissions:
 
 on:
     release:
-        types: [published, edited]
+        types: [published, prereleased, released]
 
 jobs:
     build-image:
