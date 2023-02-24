@@ -44,11 +44,14 @@ jobs:
               run: make docker-build
               env:
                   DOCKER_BUILDKIT: 1
-                  BUILDKIT_MULTI_PLATFORM: 0
+                  BUILDKIT_MULTI_PLATFORM: "false"
                   PLATFORM: ${{ matrix.platform }}
                   IMAGE_TAG: "ghcr.io/sudo-bot/docker-rustpython/rustpython:${{ matrix.internal-tag }}-latest"
                   ACTION: push
-                  EXTRA_ARGS: "--cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache:${{ matrix.internal-tag }},mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache:${{ matrix.internal-tag }}"
+                  # Disable provenance to remove the attestation from the pushed image
+                  # See: https://github.com/docker/buildx/issues/1509
+                  # It makes: ghcr.io/sudo-bot/docker-rustpython/rustpython:armv6-latest is a manifest list
+                  EXTRA_ARGS: "--provenance=false --cache-to=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache:${{ matrix.internal-tag }},mode=max --cache-from=type=registry,ref=ghcr.io/sudo-bot/docker-rustpython/rustpython-buildcache:${{ matrix.internal-tag }}"
 
     create-final-image:
         runs-on: ubuntu-latest
