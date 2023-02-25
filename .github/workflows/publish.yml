@@ -10,10 +10,13 @@ on:
     push:
         tags:
             - "*"
+        branches:
+          - "*"
 
 jobs:
     build-image:
         runs-on: ubuntu-latest
+        needs: create-final-image
         strategy:
             fail-fast: false
             max-parallel: 4
@@ -57,6 +60,7 @@ jobs:
     create-final-image:
         runs-on: ubuntu-latest
         needs: build-image
+        name: Create the image manifest
         steps:
             - name: Login to DockerHub
               uses: docker/login-action@v2
@@ -77,3 +81,38 @@ jobs:
               run: docker manifest push docker.io/botsudo/docker-rustpython:latest
             - name: Inspect the manifest
               run: docker manifest inspect docker.io/botsudo/docker-rustpython:latest
+    tags-cleanup:
+        runs-on: ubuntu-latest
+        name: Cleanup build tags
+        steps:
+            - name: Install Docker hub-tool
+              run: |
+                  curl -sL https://github.com/docker/hub-tool/releases/download/v0.4.5/hub-tool-linux-amd64.tar.gz -o hub-tool-linux.tar.gz
+                  tar --strip-components=1 -xzf ./hub-tool-linux.tar.gz
+                  ./hub-tool --version
+            - name: Login hub-tool
+              run: |
+                  # Fool the login command (https://github.com/docker/hub-tool/pull/198)
+                  # ./hub-tool login
+                  # Token commands thank to https://stackoverflow.com/a/59334315/5155484
+                  HUB_TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\": \"$DOCKER_USERNAME\", \"password\": \"$DOCKER_PASSWORD\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
+                  USERNAME="$(printf '%s:' "$DOCKER_USERNAME" | base64 -w0)"
+                  USER_PASS="$(printf '%s:%s' "$DOCKER_USERNAME" "$DOCKER_PASSWORD" | base64 -w0)"
+                  mkdir -p ~/.docker/
+                  printf '{"auths": {"hub-tool": {"auth": "%s"}, "hub-tool-refresh-token": {"auth": "%s"}, "hub-tool-token": { "auth": "%s", "identitytoken": "%s"}}}' \
+                    "$USER_PASS" "$USERNAME" \
+                    "$USERNAME" "$HUB_TOKEN" \
+                    > ~/.docker/config.json
+              env:
+                  DOCKER_USERNAME: ${{ secrets.DOCKER_REPOSITORY_LOGIN }}
+                  DOCKER_PASSWORD: ${{ secrets.DOCKER_REPOSITORY_PASSWORD }}
+            - name: Remove PR container image via hub-tool
+              run: |
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:armv6-latest || true
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:armv7-latest || true
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:arm64v8-latest || true
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:386-latest || true
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:ppc64le-latest || true
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:amd64-latest || true
+            - name: Logout hub-tool
+              run: rm ~/.docker/config.json
