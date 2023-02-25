@@ -16,7 +16,7 @@ on:
 jobs:
     build-image:
         runs-on: ubuntu-latest
-        needs: create-final-image
+        needs: tags-cleanup
         strategy:
             fail-fast: false
             max-parallel: 4
