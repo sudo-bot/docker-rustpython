@@ -3,7 +3,10 @@ name: Build docker image
 permissions:
     contents: read
 
-on: [push]
+on:
+    push:
+        tags-ignore:
+          - "*"
 
 jobs:
     build-image:
