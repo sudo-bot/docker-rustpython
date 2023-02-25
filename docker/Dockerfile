@@ -1,4 +1,3 @@
-# NAME: dclong/rustpython
 FROM alpine:3.17 as builder
 
 WORKDIR /workdir
