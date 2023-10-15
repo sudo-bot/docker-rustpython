@@ -1,6 +1,6 @@
 # A docker rustpython image
 
-This is a Docker image for the RustPython project.
+This is a Docker image for the [RustPython](https://github.com/RustPython/RustPython#readme) project.
 It had the default feature flags + `freeze-stdlib`.
 
 You can find it on [Docker Hub](https://hub.docker.com/r/botsudo/docker-rustpython) and the sources on [GitHub](https://github.com/sudo-bot/docker-rustpython).

@@ -22,8 +22,8 @@ jobs:
                     - { platform: "linux/ppc64le", internal-tag: "ppc64le" }
                     - { platform: "linux/amd64", internal-tag: "amd64" }
         steps:
-            - name: Check out the repository
-              uses: actions/checkout@v3
+            - name: Checkout repository
+              uses: actions/checkout@v4
             # https://github.com/docker/setup-qemu-action
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v2
