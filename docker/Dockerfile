@@ -1,8 +1,8 @@
-FROM alpine:3.18 as builder
+FROM alpine:3.20 as builder
 
 WORKDIR /workdir
 
-ARG RUST_PYTHON_VERSION="0.3.0"
+ARG RUST_PYTHON_VERSION="0.3.1"
 ARG BUILD_DATE
 ARG VCS_REF
 
@@ -26,7 +26,7 @@ RUN cargo fetch
 
 RUN cargo build --features freeze-stdlib --release --locked --offline --bin rustpython
 
-FROM alpine:3.18
+FROM alpine:3.20
 
 RUN apk --no-cache add musl libgcc
 
