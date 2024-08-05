@@ -82,7 +82,7 @@ jobs:
         steps:
             - name: Install Docker hub-tool
               run: |
-                  curl -sL https://github.com/docker/hub-tool/releases/download/v0.4.5/hub-tool-linux-amd64.tar.gz -o hub-tool-linux.tar.gz
+                  curl -sL https://github.com/docker/hub-tool/releases/download/v0.4.6/hub-tool-linux-amd64.tar.gz -o hub-tool-linux.tar.gz
                   tar --strip-components=1 -xzf ./hub-tool-linux.tar.gz
                   ./hub-tool --version
             - name: Login hub-tool
@@ -101,7 +101,7 @@ jobs:
               env:
                   DOCKER_USERNAME: ${{ secrets.DOCKER_REPOSITORY_LOGIN }}
                   DOCKER_PASSWORD: ${{ secrets.DOCKER_REPOSITORY_PASSWORD }}
-            - name: Remove PR container image via hub-tool
+            - name: Remove the temporary images via hub-tool
               run: |
                   ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:armv6-latest || true
                   ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:armv7-latest || true
