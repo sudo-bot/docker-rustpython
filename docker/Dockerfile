@@ -1,4 +1,4 @@
-FROM alpine:3.20 as builder
+FROM alpine:3.23 as builder
 
 WORKDIR /workdir
 
@@ -26,7 +26,7 @@ RUN cargo fetch
 
 RUN cargo build --features freeze-stdlib --release --locked --offline --bin rustpython
 
-FROM alpine:3.20
+FROM alpine:3.23
 
 RUN apk --no-cache add musl libgcc
 
