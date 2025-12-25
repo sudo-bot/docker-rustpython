@@ -32,6 +32,7 @@ We support as much as possible, the list is:
 - `linux/arm/v7`
 - `linux/arm64/v8`
 - `linux/ppc64le`
+- `linux/riscv64`
 
 For `linux/s390x`, it needs fixing:
 - See: https://github.com/nix-rust/nix/issues/1968

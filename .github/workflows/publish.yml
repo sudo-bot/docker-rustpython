@@ -7,6 +7,9 @@ on:
     release:
         types: [released]
 
+env:
+    HUB_TOOL_VERSION: 0.4.6
+
 jobs:
     build-image:
         runs-on: ubuntu-latest
@@ -21,6 +24,7 @@ jobs:
                     - { platform: "linux/386", internal-tag: "386" }
                     - { platform: "linux/ppc64le", internal-tag: "ppc64le" }
                     - { platform: "linux/amd64", internal-tag: "amd64" }
+                    - { platform: "linux/riscv64", internal-tag: "amd64" }
         steps:
             - name: Checkout repository
               uses: actions/checkout@v6
@@ -70,6 +74,7 @@ jobs:
                       docker.io/botsudo/docker-rustpython:386-latest \
                       docker.io/botsudo/docker-rustpython:ppc64le-latest \
                       docker.io/botsudo/docker-rustpython:amd64-latest \
+                      docker.io/botsudo/docker-rustpython:riscv64-latest \
                       --amend
             - name: Push the manifest
               run: docker manifest push docker.io/botsudo/docker-rustpython:latest
@@ -82,7 +87,7 @@ jobs:
         steps:
             - name: Install Docker hub-tool
               run: |
-                  curl -sL https://github.com/docker/hub-tool/releases/download/v0.4.6/hub-tool-linux-amd64.tar.gz -o hub-tool-linux.tar.gz
+                  curl -sL https://github.com/docker/hub-tool/releases/download/v${{ env.HUB_TOOL_VERSION }}/hub-tool-linux-amd64.tar.gz -o hub-tool-linux.tar.gz
                   tar --strip-components=1 -xzf ./hub-tool-linux.tar.gz
                   ./hub-tool --version
             - name: Login hub-tool
@@ -109,6 +114,7 @@ jobs:
                   ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:386-latest || true
                   ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:ppc64le-latest || true
                   ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:amd64-latest || true
+                  ./hub-tool tag rm --verbose --force docker.io/botsudo/docker-rustpython:riscv64-latest || true
                   ./hub-tool tag ls --verbose docker.io/botsudo/docker-rustpython
             - name: Logout hub-tool
               if: always()
