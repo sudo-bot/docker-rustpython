@@ -1,10 +1,18 @@
+# Build arguments must be declared before the first FROM to be global: a global
+# argument is visible to every stage, whereas one declared inside a stage is
+# scoped to that stage only. Declaring these after the FROM below left the
+# labels and the SBOM version empty, because their defaults never escaped the
+# builder stage.
+ARG RUST_PYTHON_VERSION="0.6.0"
+ARG BUILD_DATE
+ARG VCS_REF
+
 FROM alpine:3.24 AS builder
 
 WORKDIR /workdir
 
-ARG RUST_PYTHON_VERSION="0.6.0"
-ARG BUILD_DATE
-ARG VCS_REF
+# Re-declared so the global argument above is usable in this stage.
+ARG RUST_PYTHON_VERSION
 
 ENV CARGO_HOME="/workdir"
 ENV CARGO_INSTALL_ROOT="/workdir"
@@ -16,10 +24,6 @@ ADD https://github.com/RustPython/RustPython/archive/refs/tags/$RUST_PYTHON_VERS
 
 RUN tar --strip-components=1 -C /workdir -xzf /tmp/v$RUST_PYTHON_VERSION.tar.gz
 
-# Remove the git mode that triggers an error on armv6 and armv7
-# Ref: https://github.com/rust-lang/cargo/issues/2808 (failed to mmap. Could not write data: Out of memory; class=Os (2))
-RUN sed -i 's#{ git = .*#{ path = "/workdir/rp__doc__/" }#' /workdir/derive-impl/Cargo.toml
-
 RUN apk add --no-cache rust cargo musl-dev git
 
 RUN cargo fetch
@@ -28,9 +32,8 @@ RUN cargo build --features freeze-stdlib --release --locked --offline --bin rust
 
 FROM alpine:3.24
 
-# Re-declare the build arguments in this stage: an ARG declared before the first
-# FROM is not visible in later stages, so without this the metadata labels below
-# expand to an empty string and the SBOM keeps a literal ${RUST_PYTHON_VERSION}.
+# Re-declared so the global build arguments can be used by the metadata labels
+# and the SBOM below.
 ARG RUST_PYTHON_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
