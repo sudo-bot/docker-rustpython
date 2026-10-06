@@ -1,4 +1,4 @@
-FROM alpine:3.24 as builder
+FROM alpine:3.24 AS builder
 
 WORKDIR /workdir
 
@@ -28,10 +28,19 @@ RUN cargo build --features freeze-stdlib --release --locked --offline --bin rust
 
 FROM alpine:3.24
 
+# Re-declare the build arguments in this stage: an ARG declared before the first
+# FROM is not visible in later stages, so without this the metadata labels below
+# expand to an empty string and the SBOM keeps a literal ${RUST_PYTHON_VERSION}.
+ARG RUST_PYTHON_VERSION
+ARG BUILD_DATE
+ARG VCS_REF
+
 RUN apk --no-cache add musl libgcc
 
 COPY --from=builder /workdir/target/release/rustpython /usr/local/bin/rustpython
-COPY <<-"EOT" /usr/local/share/sbom/rustpython.spdx.json
+# The heredoc marker is deliberately unquoted so that it interpolates: a quoted
+# marker ("EOT") would leave ${RUST_PYTHON_VERSION} in the SBOM verbatim.
+COPY <<-EOT /usr/local/share/sbom/rustpython.spdx.json
 {
     "spdxVersion": "SPDX-2.3",
     "dataLicense": "CC0-1.0",
