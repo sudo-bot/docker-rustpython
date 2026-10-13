@@ -38,7 +38,17 @@ ARG RUST_PYTHON_VERSION
 ARG BUILD_DATE
 ARG VCS_REF
 
-RUN apk --no-cache add musl libgcc
+# libatomic is required on armv6 only: that architecture has no lower-level
+# 64-bit atomic instructions, so the builder links rustpython against
+# libatomic.so.1 and the binary then dies at startup with "Error loading shared
+# library libatomic.so.1: No such file or directory (needed by
+# /usr/local/bin/rustpython)" and "Error relocating ... __atomic_load_8: symbol
+# not found", exiting 127. The previous image did not reference libatomic at
+# all, so this came in with the current builder toolchain. armv7, 386, arm64,
+# ppc64le, riscv64 and amd64 resolve those atomics themselves and build without
+# it, but the package is 20 KB and installing it unconditionally keeps the
+# Dockerfile free of architecture conditionals.
+RUN apk --no-cache add musl libgcc libatomic
 
 COPY --from=builder /workdir/target/release/rustpython /usr/local/bin/rustpython
 # The heredoc marker is deliberately unquoted so that it interpolates: a quoted
